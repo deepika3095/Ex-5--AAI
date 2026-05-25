@@ -27,68 +27,49 @@ To Construct a Python code to implement the Kalman filter to predict the positio
 import numpy as np
 import matplotlib.pyplot as plt
 
-class KalmanFilter:
-    def __init__(self, F, H, Q, R, x0, P0):
-        self.F = F
-        self.H = H
-        self.Q = Q
-        self.R = R
-        self.x = x0
-        self.P = P0
-
-    def predict(self):
-        self.x = np.dot(self.F, self.x)
-        self.P = np.dot(np.dot(self.F, self.P), self.F.T) + self.Q
-
-    def update(self, z):
-        y = z - np.dot(self.H, self.x)
-        S = np.dot(np.dot(self.H, self.P), self.H.T) + self.R
-        K = np.dot(np.dot(self.P, self.H.T), np.linalg.inv(S))
-        self.x = self.x + np.dot(K, y)
-
 dt = 0.1
 
-F = np.array([
-    [1, dt],
-    [0, 1]
-])
+F = np.array([[1, dt],
+              [0, 1]])
 
-H = np.array([
-    [1, 0]
-])
+H = np.array([[1, 0]])
 
-Q = np.diag([0.1, 0.1])
+Q = np.eye(2) * 0.1
+R = np.array([[1]])
 
-R = np.array([
-    [1]
-])
+x = np.array([0, 0])
+P = np.eye(2)
 
-x0 = np.array([0, 0])
-
-P0 = np.diag([1, 1])
-
-kf = KalmanFilter(F, H, Q, R, x0, P0)
-
-true_states = []
+true_pos = []
 measurements = []
+estimates = []
 
 for i in range(100):
-    true_states.append([i * dt, 1])
-    measurements.append(i * dt + np.random.normal(scale=1))
+    true_position = i * dt
+    z = true_position + np.random.normal(0, 1)
 
-est_states = []
+    x = F @ x
+    P = F @ P @ F.T + Q
 
-for z in measurements:
-    kf.predict()
-    kf.update(np.array([z]))
-    est_states.append(kf.x)
+    y = z - H @ x
+    S = H @ P @ H.T + R
+    K = P @ H.T @ np.linalg.inv(S)
 
-plt.plot([s[0] for s in true_states], label='True')
-plt.plot([s[0] for s in est_states], label='Estimate')
+    x = x + (K @ y).flatten()
+
+    true_pos.append(true_position)
+    measurements.append(z)
+    estimates.append(x[0])
+
+plt.plot(true_pos, label="True")
+plt.plot(measurements, label="Measurement")
+plt.plot(estimates, label="Estimate")
 
 plt.legend()
+
 print("NAME: DEEPIKA R")
 print("212223230038")
+
 plt.show()
 ```
 
