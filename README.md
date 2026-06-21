@@ -48,14 +48,14 @@ for i in range(100):
     true_position = i * dt
     z = true_position + np.random.normal(0, 1)
 
-    x = F @ x
-    P = F @ P @ F.T + Q
+    x = np.dot(F, x)
+    P = np.dot(np.dot(F, P), F.T) + Q
 
-    y = z - H @ x
-    S = H @ P @ H.T + R
-    K = P @ H.T @ np.linalg.inv(S)
+    y = z - np.dot(H, x)
+    S = np.dot(np.dot(H, P), H.T) + R
+    K = np.dot(np.dot(P, H.T), np.linalg.inv(S))
 
-    x = x + (K @ y).flatten()
+    x = x + np.dot(K, y).flatten()
 
     true_pos.append(true_position)
     measurements.append(z)
